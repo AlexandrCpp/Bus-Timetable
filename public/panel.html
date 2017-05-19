@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Расписание автобусов</title>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+
+</head>
+<body>
+<div class="back">
+
+    <div id="tab/three" class="abs tabs block">
+        <p class="abs">
+            &lt;div <span style="color: #444">id="tab/three"</span>&gt;
+            <br/>...
+            <br/>&lt;/div&gt;
+        </p>
+    </div>
+
+    <div id="tab/two" class="abs tabs block">
+        <p class="abs">
+            &lt;div <span style="color: #444">id="tab/two"</span>&gt;
+            <br/>...
+            <br/>&lt;/div&gt;
+        </p></div>
+
+
+    <div id="tab" class="abs block">
+        <a href="#one">Остановки</a>
+        <a href="#two">Маршруты</a>
+        <a href="#three">Автобусы</a>
+        <a href="#fouth">История</a>
+
+    </div>
+
+    <div id="fouth" class="abs block">
+        <a href="#one">Остановки</a>
+        <a href="#two">Маршруты</a>
+        <a href="#three">Автобусы</a>
+        <b><a href="#fouth">История</a></b>
+        <p class="abs">
+            <script>
+                $.ajax({
+                    url: "api/histories",
+                    type: "GET",
+                    success: function (res) {
+                        console.log(res);
+                        res.forEach(function (item,i) {
+                            $("#fouth").find(".abs").append('<span ondblclick="showInput(this,this.innerText)" id="history'+res[i].id+'">'+res[i].busId+'</span></br>');
+                        })
+                    },
+                    error: function (err) {
+                        console.log(err.responseJSON);
+                    }
+                });
+            </script>
+        </p>
+    </div>
+
+    <div id="three" class="abs block">
+        <a href="#one">Остановки</a>
+        <a href="#two">Маршруты</a>
+        <b><a href="#three">Автобусы</a></b>
+        <a href="#fouth">История</a>
+        <p class="abs">
+            <script>
+                var header='<table border="1"><tr><td>Номер</td><td>Маршрут</td></tr>';
+                var  table = '';
+                $.ajax({
+                    url: "api/buses",
+                    type: "GET",
+                    success: function (res) {
+                        res.forEach(function (item,i) {
+                            console.log(item);
+                            table+='<tr><td><span ondblclick="showInputBus(this,this.innerText,\'buses/'+item.buses[0].id+'\')" id="buses/'+item.buses[0].id+'">'+item.buses[0].number+'</span></td><td><span ondblclick="showInputBusRouter(this,this.innerText,\'buses/'+item.buses[0].id+'\')" id="buses/'+item.buses[0].id+'">'+item.buses[0].routerId+'</span></td><td><button class="btn" onclick="delBus($(this).closest(\'tr\'),'+item.id+')">Удалить</button></td></tr>';
+                        });
+                        var addBus = '<tr id="addBusInput"><td><input id="numberBus" type="text"></td><td><input type="text" id="numberRout"></td><td><button class="btn" onclick="addBus()">Добавить</button></td></tr>';
+                        $("#three").find(".abs").append(header+table +addBus+'</table>');
+
+                    },
+                    error: function (err) {
+                        console.log(err.responseJSON);
+                    }
+                });
+            </script>
+        </p>
+    </div>
+
+    <div id="two" class="abs block">
+        <a href="#one">Остановки</a>
+        <b><a href="#two">Маршруты</a></b>
+        <a href="#three">Автобусы</a>
+        <a href="#fouth">История</a>
+
+        <p class="abs">
+            <script>
+                $.ajax({
+                    url: "api/routers",
+                    type: "GET",
+                    success: function (res) {
+                        res.forEach(function (item,i) {
+                            $("#two").find(".abs").append('<div><span ondblclick="showInput(this,this.innerText,\'routers/'+item.id+'\')" id="routers/'+item.id+'">'+item.name+'</span><button class="btn" onclick="delRout($(this).parent(),'+item.id+')">Удалить</button></div>');
+                        })
+                    },
+                    error: function (err) {
+                        console.log(err.responseJSON);
+                    }
+                });
+            </script>
+        </p>
+    </div>
+
+    <div id="one" class="abs block">
+        <b><a href="#one">Остановки</a></b>
+        <a href="#two">Маршруты</a>
+        <a href="#three">Автобусы</a>
+        <a href="#fouth">История</a>
+        <p class="abs">
+            <script>
+                $.ajax({
+                    url: "api/stops",
+                    type: "GET",
+                    success: function (res) {
+                        var bod = '';
+                        res.forEach(function (item,i) {
+                            bod+='<div><span ondblclick="showInput(this,this.innerText,\'stops/'+item.id+'\')" id="stops/'+item.id+'">'+item.name+'</span><button class="btn" onclick="delStop($(this).parent(),'+item.id+')">Удалить</button></div>';
+                        });
+                        var bodAdd='<div id="addStopDiv"><input id="addStop" type="text"><button onclick="addStop()" class="btn">Добавить</button></div>';
+                        $("#one").find(".abs").append(bod+bodAdd);
+
+                    },
+                    error: function (err) {
+                        console.log(err.responseJSON);
+                    }
+                });
+            </script>
+        </p>
+    </div>
+
+</div>
+<script>
+    function addStop() {
+        var value = $("#addStop").val();
+        $.ajax({
+            url: "api/stops",
+            type: "POST",
+            datatype: "application/json",
+            data:{
+                name:value
+            },
+            success: function (res) {
+                $("#addStopDiv").before('<div><span ondblclick="showInput(this,this.innerText,\'stops/'+res.id+'\')" id="stops/'+res.id+'">'+res.name+'</span><button class="btn" onclick="delStop($(this).parent(),'+res.id+')">Удалить</button></div>');
+                $("#addStop").val('');
+            },
+            error: function (err) {
+                console.log(err.responseJSON);
+            }
+        });
+    }
+    function addBus() {
+        var numberBus = $("#numberBus").val();
+        var numberRout = $("#numberRout").val();
+        $.ajax({
+            url: "api/buses",
+            type: "POST",
+            datatype: "application/json",
+            data:{
+                number:numberBus,
+                routerId:numberRout
+            },
+            success: function (res) {
+                console.log(res);
+                $("#addBusInput").before('<tr><td><span ondblclick="showInputBus(this,this.innerText,\'buses/'+res.id+'\')" id="buses/'+res.id+'">'+res.number+'</span></td><td><span ondblclick="showInputBusRouter(this,this.innerText,\'buses/'+res.id+'\')" id="buses/'+res.id+'">'+res.routerId+'</span></td><td><button class="btn" onclick="delBus($(this).closest(\'tr\'),'+res.id+')">Удалить</button></td></tr>');
+                $("#addBusInput").find('input').val('');
+            },
+            error: function (err) {
+                console.log(err.responseJSON);
+            }
+        });
+    }
+
+    function showInput(self,value,id) {
+        var input = document.createElement("input");
+        //input.id = name+rowIndex;
+        input.value = value;
+        $(self).replaceWith(input);
+        $(input).keyup(function (event) {
+            if (event.which == '13') {
+                var  self2 = this;
+                $.ajax({
+                    url: "api/"+id,
+                    type: "PUT",
+                    datatype:"application/josn",
+                    data:{
+                        name: input.value
+                    },
+                    success: function (res) {
+                        console.log(res);
+                        hideInput(self2,self2.value,id);
+
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+            }
+        });
+    }
+    function showInputBus(self,value,id) {
+        var input = document.createElement("input");
+        //input.id = name+rowIndex;
+        input.value = value;
+        $(self).replaceWith(input);
+        $(input).keyup(function (event) {
+            if (event.which == '13') {
+                var  self2 = this;
+                $.ajax({
+                    url: "api/"+id,
+                    type: "PUT",
+                    datatype:"application/josn",
+                    data:{
+                        number: input.value
+                    },
+                    success: function (res) {
+                        console.log(res);
+                        hideInput(self2,self2.value,id);
+
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+            }
+        });
+    }
+    function showInputBusRouter(self,value,id) {
+        var input = document.createElement("input");
+        //input.id = name+rowIndex;
+        input.value = value;
+        $(self).replaceWith(input);
+        $(input).keyup(function (event) {
+            if (event.which == '13') {
+                var  self2 = this;
+                $.ajax({
+                    url: "api/"+id,
+                    type: "PUT",
+                    datatype:"application/josn",
+                    data:{
+                        routerId: input.value
+                    },
+                    success: function (res) {
+                        console.log(res);
+                        hideInput(self2,self2.value,id);
+
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+            }
+        });
+    }
+    function hideInput(self,value,id) {
+        console.log(id);
+        var span = document.createElement("span");
+        span.innerText = value;
+        span.id = id;
+        $(self).replaceWith(span);
+    }
+
+    function delStop(self,id) {
+        $.ajax({
+            url: "api/stops/"+id,
+            type: "DELETE",
+            datatype:"application/josn",
+            success: function (res) {
+                self.remove();
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    }
+    function delBus(self,id) {
+        $.ajax({
+            url: "api/buses/"+id,
+            type: "DELETE",
+            datatype:"application/josn",
+            success: function (res) {
+                self.remove();
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    }
+        function delRout(self,id) {
+        $.ajax({
+            url: "api/routers/"+id,
+            type: "DELETE",
+            datatype:"application/josn",
+            success: function (res) {
+                self.remove();
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

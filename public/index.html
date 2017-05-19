@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Расписание автобусов</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+    <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div id="app">
+    <div class="row"></div>
+</div>
+<div class="cd-popup" role="alert">
+    <div class="cd-popup-container">
+        <ul class="stopList">
+
+        </ul>
+        <a href="#0" class="cd-popup-close img-replace">Close</a>
+    </div>
+</div>
+<script>
+    const basePath = "/api";
+
+    $.ajax({
+        url: basePath + "/buses",
+        type: "GET",
+        success: function (res) {
+            console.log(res);
+            res.forEach(function (item) {
+                $(".row").append('<div class="col-md-1 card" onclick="getStops(' + item.buses[0].id + ')">' + item.buses[0].number + '<div class="standartClass"><span class="title">'+item.name+'</span></div></div>');
+            })
+        },
+        error: function (err) {
+            console.log(err.responseJSON);
+        }
+    });
+
+    function getStops(busId) {
+        $.ajax({
+            url: basePath + "/buses/" + busId,
+            type: "GET",
+            success: function (res) {
+                console.log(res);
+
+                //open popup
+                res.forEach(function (item) {
+                    $.ajax({
+                        url: basePath + "/stops/" + item.stop.id,
+                        type: "GET",
+                        async: false,
+                        success: function (response) {
+                            console.log(response);
+                            /******/
+
+
+                            var timeList ='<span">';
+                             response.forEach(function (item) {
+                                timeList+=item.departureTime+'</span></br>';
+                            });
+
+                            $(".stopList").append('<div class="spoiler-wrapper"><div class="spoiler folded"><a href="javascript:void(0);">' + item.stop.name + '</a></div><div class="spoiler-text">' + timeList + '</div></div>')
+
+
+                            /********/
+                        },
+                        error: function (err) {
+                            console.log(err.responseJSON);
+                        }
+                    });
+                });
+                $('.spoiler-text').hide();
+                $('.spoiler').click(function () {
+                    $(this).toggleClass("folded").toggleClass("unfolded").next().slideToggle()
+                });
+                $('.cd-popup').addClass('is-visible');
+
+                //close popup
+                $('.cd-popup').on('click', function (event) {
+                    if ($(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup')) {
+                        $(".stopList").empty();
+                        event.preventDefault();
+                        $(this).removeClass('is-visible');
+                    }
+                });
+                //close popup when clicking the esc keyboard button
+                $(document).keyup(function (event) {
+                    if (event.which == '27') {
+                        $('.cd-popup').removeClass('is-visible');
+                    }
+                });
+            },
+            error: function (err) {
+                console.log(err.responseJSON);
+            }
+        })
+
+
+    }
+</script>
+</body>
+</html>

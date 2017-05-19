@@ -1,0 +1,19 @@
+{
+  "db": {
+    "host": "",
+    "name": "",
+    "router": "",
+    "password": ""
+  },
+  "dbtest": {
+    "host": "127.0.0.1",
+    "name": "Bus-Timetable",
+    "router": "root",
+    "password": ""
+  },
+  "env": "dev",
+  "cookie": {
+    "key": "secret key",
+    "token": "x-access-token"
+  }
+}
