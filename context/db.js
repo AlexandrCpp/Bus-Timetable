@@ -4,10 +4,9 @@ global.isProduction
 
 module.exports = (Sequelize, config) => {
     const options = {
-        host: isProduction ? config.db.host : config.dbtest.host,
-        dialect: isProduction ? 'postgres' : 'mysql',
-        port: isProduction ? 5432 : 3306,
-        protocol: 'postgres',
+        host: config.db.host,
+        dialect: 'postgres',
+        port: 5432,
         logging: true,
         define: {
             timestamps: true,
