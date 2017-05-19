@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "node index.js",
-    "install": " npm i pg"
+    "postinstall": " npm i pg"
   },
   "engines": {
     "node": "6.9.5"
