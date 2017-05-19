@@ -2,7 +2,8 @@
   "name": "Bus-Timetable",
   "version": "1.0.0",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "install": " npm i pg"
   },
   "engines": {
     "node": "6.9.5"
