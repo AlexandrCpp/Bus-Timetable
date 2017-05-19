@@ -3,7 +3,7 @@
     "host": "ec2-54-228-255-234.eu-west-1.compute.amazonaws.com",
     "name": "d8p93tipbt3eo5",
     "router": "ioqdjjeehrgvuu",
-    "password": "aa64b1312b38e7901b0e44db9f711dbc941184c5dafe072b820a4ca1afdb1b45   "
+    "password": "aa64b1312b38e7901b0e44db9f711dbc941184c5dafe072b820a4ca1afdb1b45"
   },
   "dbtest": {
     "host": "127.0.0.1",
